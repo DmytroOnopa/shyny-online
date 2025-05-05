@@ -1,10 +1,5 @@
-# macOS / Linux
 .DS_Store
-
-# Windows
 Thumbs.db
-
-# Node / Logs / Python cache (на майбутнє)
 node_modules/
 *.log
 __pycache__/
