@@ -1,65 +1,81 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ШИНИ.ONLINE</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ШИНИ.ONLINE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+    }
+    header {
+      background: #111;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #444;
+    }
+    header h1 {
+      font-size: 2.5em;
+      margin: 0;
+      color: #f8d03f;
+    }
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+      background: url('https://images.unsplash.com/photo-1603366615917-1fa6dad5c4f4') no-repeat center center/cover;
+      color: #fff;
+    }
+    .hero h2 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      background-color: rgba(0,0,0,0.5);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+    .btn {
+      background: #f8d03f;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1em;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #000;
+      font-weight: bold;
+    }
+    .section {
+      padding: 40px 20px;
+      text-align: center;
+    }
+    footer {
+      background: #111;
+      color: #aaa;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>ШИНИ.ONLINE</h1>
-        <p>Вживані шини на будь-яку техніку</p>
-        <a href="https://t.me/shynyRobot" class="btn">Написати в Telegram</a>
-    </header>
-
-    <section id="about">
-        <h2>Про нас</h2>
-        <p>Продаємо вживані шини на легкові авто, вантажівки, сільгосп та спецтехніку. Гарантуємо якість та швидку доставку.</p>
-    </section>
-
-    <section id="categories">
-        <h2>Категорії</h2>
-        <ul>
-            <li>Легкові</li>
-            <li>Вантажні</li>
-            <li>Сільгосптехніка</li>
-            <li>Спецтехніка</li>
-            <li>Мото/Квадро</li>
-        </ul>
-    </section>
-
-    <section id="products">
-        <h2>Товари</h2>
-        <div class="product-list">
-            <div class="product">
-                <img src="images/tire1.jpg" alt="Шина 195/65 R15">
-                <h3>195/65 R15</h3>
-                <p>Стан: 80%, пара</p>
-                <a href="https://t.me/shynyRobot" class="btn">Замовити</a>
-            </div>
-            <div class="product">
-                <img src="images/tire2.jpg" alt="Шина 205/55 R16">
-                <h3>205/55 R16</h3>
-                <p>Стан: 70%, комплект</p>
-                <a href="https://t.me/shynyRobot" class="btn">Замовити</a>
-            </div>
-            <div class="product">
-                <img src="images/tire3.jpg" alt="Шина 385/65 R22.5">
-                <h3>385/65 R22.5</h3>
-                <p>Стан: 60%, одна</p>
-                <a href="https://t.me/shynyRobot" class="btn">Замовити</a>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact">
-        <h2>Зв’яжіться з нами</h2>
-        <a href="https://t.me/shynyRobot" class="btn">Telegram</a>
-    </section>
-
-    <footer>
-        <p>&copy; 2025 ШИНИ.ONLINE</p>
-    </footer>
+  <header>
+    <h1>ШИНИ.ONLINE</h1>
+  </header>
+  <div class="hero">
+    <h2>Вживані шини на будь-яку техніку</h2>
+    <a class="btn" href="https://t.me/shynyRobot" target="_blank">Замовити через Telegram</a>
+  </div>
+  <div class="section">
+    <h2>Надійно. Доступно. Швидко.</h2>
+    <p>Ми пропонуємо широкий вибір шин для легкових, вантажних авто та спецтехніки. Обирайте вигідно вже зараз!</p>
+  </div>
+  <footer>
+    &copy; 2025 ШИНИ.ONLINE — Всі права захищено
+  </footer>
 </body>
 </html>
+
