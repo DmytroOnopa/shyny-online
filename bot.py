@@ -219,6 +219,22 @@ async def set_new_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("✅ Фото оновлено.")
     return ConversationHandler.END
 
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_admin(update.effective_user.id):
+        await update.message.reply_text("⛔️ Доступ заборонено.")
+        return
+
+    await update.message.reply_text(
+        "👋 Вітаю! Доступні команди:\n"
+        "/add – додати товар\n"
+        "/list – список товарів\n"
+        "/delete – видалити товар\n"
+        "/edit_name – редагувати назву\n"
+        "/edit_description – редагувати опис\n"
+        "/edit_photo – редагувати фото"
+    )
+
+
 # Main
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
