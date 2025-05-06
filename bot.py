@@ -1,60 +1,65 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import (
     Application, CommandHandler, MessageHandler, filters,
     ConversationHandler, ContextTypes, CallbackQueryHandler
 )
 import json, os, subprocess
 
-TOKEN = "8043656898:AAGTfXdIV0s60scs_5WPXwMlnd2RRQvDLQs"
-OWNER_ID = 249385425
-PRODUCTS_FILE = "products.json"
-ADD_NAME, ADD_DESC, ADD_PHOTO = range(3)
-EDIT_SELECT, EDIT_FIELD, EDIT_VALUE, EDIT_CONFIRM = range(4)
-DELETE_CONFIRM = range(1)
+import os
+from dotenv import load_dotenv
 
-# Завантаження товарів
+# Завантажити змінні середовища з .env файлу
+load_dotenv()
+
+# Отримати токен з середовища
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+PRODUCTS_FILE = "products.json"
+ADMIN_ID = 249385425
+
+ADD_NAME, ADD_DESC, ADD_PHOTO = range(3)
+EDIT_NAME, EDIT_DESC, EDIT_PHOTO = range(3)
+CONFIRM_DELETE = 0
+
 def load_products():
     if not os.path.exists(PRODUCTS_FILE):
         return []
     with open(PRODUCTS_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-# Збереження товарів
 def save_products(products):
     with open(PRODUCTS_FILE, "w", encoding="utf-8") as f:
         json.dump(products, f, ensure_ascii=False, indent=2)
 
-# Генерація сайту
 def generate_site():
     subprocess.run(["python3", "generate_site.py"])
 
-# Обмеження доступу
-def is_owner(update: Update):
-    return update.effective_user.id == OWNER_ID
+# ========== AUTH ================
+def is_admin(user_id):
+    return user_id == ADMIN_ID
 
-# Команда /start
+# ========== START ===============
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_owner(update):
-        return
+    if not is_admin(update.effective_user.id):
+        return await update.message.reply_text("⛔ Доступ заборонено.")
     await update.message.reply_text(
         "Привіт! Я бот для керування товарами 🛞\n"
         "/add — додати товар\n"
+        "/list — переглянути товари\n"
         "/edit — редагувати товар\n"
         "/delete — видалити товар\n"
-        "/list — переглянути всі товари\n"
         "/cancel — скасувати дію"
     )
 
-# Додавання товару
+# ========== ДОДАВАННЯ ============
 async def add_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_owner(update):
-        return
+    if not is_admin(update.effective_user.id): return
     await update.message.reply_text("Введи назву товару:")
     return ADD_NAME
 
 async def add_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["name"] = update.message.text
-    await update.message.reply_text("Тепер введи опис товару:")
+    await update.message.reply_text("Введи опис товару:")
     return ADD_DESC
 
 async def add_desc(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -78,14 +83,17 @@ async def add_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     })
     save_products(products)
     generate_site()
-
     await update.message.reply_text("✅ Товар додано та сайт оновлено!")
     return ConversationHandler.END
 
-# Перелік товарів
+# ========== СКАСУВАННЯ ============
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("❌ Дію скасовано.")
+    return ConversationHandler.END
+
+# ========== СПИСОК ===============
 async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_owner(update):
-        return
+    if not is_admin(update.effective_user.id): return
     products = load_products()
     if not products:
         await update.message.reply_text("Список товарів порожній.")
@@ -95,93 +103,89 @@ async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open(p['image'], 'rb') as img:
             await update.message.reply_photo(photo=img, caption=caption)
 
-# Скасування
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("❌ Дію скасовано.")
-    return ConversationHandler.END
-
-# Редагування товару
+# ========== РЕДАГУВАННЯ ===============
 async def edit_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_owner(update): return
+    if not is_admin(update.effective_user.id): return
     products = load_products()
-    buttons = [[InlineKeyboardButton(p['name'], callback_data=str(p['id']))] for p in products]
-    await update.message.reply_text("Оберіть товар для редагування:", reply_markup=InlineKeyboardMarkup(buttons))
-    return EDIT_SELECT
+    keyboard = [[InlineKeyboardButton(p["name"], callback_data=f"edit_{p['id']}")] for p in products]
+    await update.message.reply_text("Вибери товар для редагування:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return EDIT_NAME
 
-async def edit_select(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start_edit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    context.user_data['edit_id'] = int(query.data)
-    buttons = [
-        [InlineKeyboardButton("Назва", callback_data="name")],
-        [InlineKeyboardButton("Опис", callback_data="desc")],
-        [InlineKeyboardButton("Фото", callback_data="image")],
-    ]
-    await query.edit_message_text("Що хочеш змінити?", reply_markup=InlineKeyboardMarkup(buttons))
-    return EDIT_FIELD
+    pid = int(query.data.split("_")[1])
+    context.user_data["edit_id"] = pid
+    await query.message.reply_text("Введи нову назву:")
+    return EDIT_NAME
 
-async def edit_field(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    context.user_data['edit_field'] = query.data
-    await query.edit_message_text("Введи нове значення (або надішли нове фото):")
-    return EDIT_VALUE
+async def edit_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data["new_name"] = update.message.text
+    await update.message.reply_text("Введи новий опис:")
+    return EDIT_DESC
 
-async def edit_value(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def edit_desc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data["new_desc"] = update.message.text
+    await update.message.reply_text("Надішли нове фото:")
+    return EDIT_PHOTO
+
+async def edit_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo[-1]
+    photo_file = await photo.get_file()
+    file_path = f"images/{photo_file.file_id}.jpg"
+    await photo_file.download_to_drive(file_path)
+
     products = load_products()
-    product = next((p for p in products if p['id'] == context.user_data['edit_id']), None)
-    if not product:
-        await update.message.reply_text("❌ Товар не знайдено.")
-        return ConversationHandler.END
-
-    field = context.user_data['edit_field']
-    if field == "image" and update.message.photo:
-        photo = update.message.photo[-1]
-        photo_file = await photo.get_file()
-        file_path = f"images/{photo_file.file_id}.jpg"
-        await photo_file.download_to_drive(file_path)
-        product['image'] = file_path
-    elif field in ["name", "desc"]:
-        product[field] = update.message.text
-    else:
-        await update.message.reply_text("❌ Неправильний ввід.")
-        return ConversationHandler.END
-
+    pid = context.user_data["edit_id"]
+    for p in products:
+        if p["id"] == pid:
+            p["name"] = context.user_data["new_name"]
+            p["desc"] = context.user_data["new_desc"]
+            p["image"] = file_path
+            break
     save_products(products)
     generate_site()
-    await update.message.reply_text("✅ Товар оновлено!")
+    await update.message.reply_text("✏️ Товар оновлено!")
     return ConversationHandler.END
 
-# Видалення товару
+# ========== ВИДАЛЕННЯ ===============
 async def delete_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not is_owner(update): return
+    if not is_admin(update.effective_user.id): return
     products = load_products()
-    buttons = [[InlineKeyboardButton(p['name'], callback_data=str(p['id']))] for p in products]
-    await update.message.reply_text("Оберіть товар для видалення:", reply_markup=InlineKeyboardMarkup(buttons))
-    return DELETE_CONFIRM
+    keyboard = [[InlineKeyboardButton(p["name"], callback_data=f"del_{p['id']}")] for p in products]
+    await update.message.reply_text("Вибери товар для видалення:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return CONFIRM_DELETE
 
-async def delete_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    prod_id = int(query.data)
-    products = load_products()
-    product = next((p for p in products if p['id'] == prod_id), None)
-    if not product:
-        await query.edit_message_text("❌ Товар не знайдено.")
-        return ConversationHandler.END
+    pid = int(query.data.split("_")[1])
+    context.user_data["delete_id"] = pid
+    keyboard = [
+        [InlineKeyboardButton("✅ Так", callback_data="confirm_delete")],
+        [InlineKeyboardButton("❌ Ні", callback_data="cancel")]
+    ]
+    await query.message.reply_text("Підтверджуєш видалення?", reply_markup=InlineKeyboardMarkup(keyboard))
+    return CONFIRM_DELETE
 
-    products = [p for p in products if p['id'] != prod_id]
-    save_products(products)
-    generate_site()
-    await query.edit_message_text("🗑️ Товар видалено та сайт оновлено!")
+async def confirm_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    if query.data == "confirm_delete":
+        products = load_products()
+        pid = context.user_data["delete_id"]
+        products = [p for p in products if p["id"] != pid]
+        for i, p in enumerate(products): p["id"] = i + 1
+        save_products(products)
+        generate_site()
+        await query.message.reply_text("🗑️ Товар видалено!")
+    else:
+        await query.message.reply_text("❌ Скасовано.")
     return ConversationHandler.END
 
-# Запуск
+# ========== ЗАПУСК ==================
 def main():
     app = Application.builder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("list", list_products))
 
     add_conv = ConversationHandler(
         entry_points=[CommandHandler("add", add_start)],
@@ -196,27 +200,26 @@ def main():
     edit_conv = ConversationHandler(
         entry_points=[CommandHandler("edit", edit_start)],
         states={
-            EDIT_SELECT: [CallbackQueryHandler(edit_select)],
-            EDIT_FIELD: [CallbackQueryHandler(edit_field)],
-            EDIT_VALUE: [MessageHandler(filters.TEXT | filters.PHOTO, edit_value)],
+            EDIT_NAME: [CallbackQueryHandler(start_edit)],
+            EDIT_DESC: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_name)],
+            EDIT_PHOTO: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_desc), MessageHandler(filters.PHOTO, edit_photo)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
-        per_message=True
     )
 
     delete_conv = ConversationHandler(
         entry_points=[CommandHandler("delete", delete_start)],
         states={
-            DELETE_CONFIRM: [CallbackQueryHandler(delete_confirm)],
+            CONFIRM_DELETE: [CallbackQueryHandler(start_delete), CallbackQueryHandler(confirm_delete)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
-        per_message=True
     )
 
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("list", list_products))
     app.add_handler(add_conv)
     app.add_handler(edit_conv)
     app.add_handler(delete_conv)
-
     app.run_polling()
 
 if __name__ == "__main__":
