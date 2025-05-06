@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess  # Для виконання команд Git
 
 def load_products():
     if not os.path.exists("products.json"):
@@ -22,7 +23,7 @@ def generate_site():
 
   <header class="bg-white shadow sticky top-0 z-10">
     <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-900">🛞 ШИНИ.ONLINE</h1>
+      <h1 class="text-2xl font-bold text-gray-900">🛞 ИНИ.ONLINE</h1>
       <a href="https://t.me/shynyRobot" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Зв'язатися</a>
     </div>
   </header>
@@ -56,6 +57,11 @@ def generate_site():
 
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
+
+    # Пуш в git після генерації сайту
+    subprocess.run(["git", "add", "."])  # Додаємо зміни
+    subprocess.run(["git", "commit", "-m", "Оновлений сайт після додавання товару"])  # Створюємо коміт
+    subprocess.run(["git", "push"])  # Пушимо в репозиторій
 
 if __name__ == "__main__":
     generate_site()
