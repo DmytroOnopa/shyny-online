@@ -1,30 +1,45 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>ШИНИ.ONLINE</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-        .product { background: white; border-radius: 8px; padding: 10px; margin: 10px auto; max-width: 400px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-        .product img { max-width: 100%; border-radius: 6px; }
-        .product h2 { margin: 10px 0 5px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ШИНИ.ONLINE</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>ШИНИ.ONLINE — Вживані шини</h1>
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="product">
-        <img src="images/AgACAgIAAxkBAAMRaBnAH3tkAc79--As-yJ6hj-wyZsAArf4MRvme8lIyE30oo-OKP4BAAMCAANtAAM2BA.jpg" alt="Вживані шини до вантажних автомобілів, причепів та напівпричепів.">
-        <h2>Вживані шини до вантажних автомобілів, причепів та напівпричепів.</h2>
-        <p>Б/У шини Для вантажівок ГАЗ 53 КамАЗ МАЗ ЗИЛ МАН Scania. А також для причепів напівпричепів бочок та зерновозів!</p>
+  <header class="bg-white shadow sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-900">🛞 ШИНИ.ONLINE</h1>
+      <a href="https://t.me/shynyRobot" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Зв'язатися</a>
     </div>
-    
-    <div class="product">
-        <img src="images/AgACAgIAAxkBAAMpaBnDrIDIHJ6S4OF-XwOcp1XF2RYAAtf4MRvme8lIMjds1DEQ2_kBAAMCAAN5AAM2BA.jpg" alt="Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ">
-        <h2>Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ</h2>
-        <p>Продаємо вживані шини BRIDGESTONE 385/65 R22.5
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-xl font-semibold mb-6">Доступні товари:</h2>
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+
+      <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4">
+        <img src="images/AgACAgIAAxkBAAMRaBnAH3tkAc79--As-yJ6hj-wyZsAArf4MRvme8lIyE30oo-OKP4BAAMCAANtAAM2BA.jpg" alt="Вживані шини до вантажних автомобілів, причепів та напівпричепів." class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold">Вживані шини до вантажних автомобілів, причепів та напівпричепів.</h3>
+        <p class="text-sm text-gray-600">Б/У шини Для вантажівок ГАЗ 53 КамАЗ МАЗ ЗИЛ МАН Scania. А також для причепів напівпричепів бочок та зерновозів!</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4">
+        <img src="images/AgACAgIAAxkBAAMpaBnDrIDIHJ6S4OF-XwOcp1XF2RYAAtf4MRvme8lIMjds1DEQ2_kBAAMCAAN5AAM2BA.jpg" alt="Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold">Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ</h3>
+        <p class="text-sm text-gray-600">Продаємо вживані шини BRIDGESTONE 385/65 R22.5
 Кар єрна модель з посиленим кордом.
 Підійде для зерновозів та техніки під перевантаження.
 Міцна резина з гарним залишком протектора.</p>
+      </div>
+
     </div>
-    </body></html>
+  </main>
+
+  <footer class="text-center text-gray-500 text-sm py-6">
+    &copy; 2025 ШИНИ.ONLINE — Вживані шини для будь-якої техніки
+  </footer>
+
+</body>
+</html>

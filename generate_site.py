@@ -1,47 +1,62 @@
-# generate_site.py
 import json
 import os
-import subprocess
 
-with open("products.json", encoding="utf-8") as f:
-    products = json.load(f)
+def load_products():
+    if not os.path.exists("products.json"):
+        return []
+    with open("products.json", "r", encoding="utf-8") as f:
+        return json.load(f)
 
-html = """<!DOCTYPE html>
+def generate_site():
+    products = load_products()
+
+    html = """<!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>ШИНИ.ONLINE</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-        .product { background: white; border-radius: 8px; padding: 10px; margin: 10px auto; max-width: 400px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-        .product img { max-width: 100%; border-radius: 6px; }
-        .product h2 { margin: 10px 0 5px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ШИНИ.ONLINE</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>ШИНИ.ONLINE — Вживані шини</h1>
+<body class="bg-gray-100 text-gray-800">
+
+  <header class="bg-white shadow sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-900">🛞 ШИНИ.ONLINE</h1>
+      <a href="https://t.me/shynyRobot" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Зв'язатися</a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-xl font-semibold mb-6">Доступні товари:</h2>
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
 """
 
-for p in products:
-    rel_path = p["image"].replace("images/", "")
-    html += f"""
-    <div class="product">
-        <img src="images/{rel_path}" alt="{p['name']}">
-        <h2>{p['name']}</h2>
-        <p>{p['desc']}</p>
+    for p in products:
+        image_path = p["image"].replace("images/", "")
+        html += f"""
+      <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4">
+        <img src="images/{image_path}" alt="{p['name']}" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold">{p['name']}</h3>
+        <p class="text-sm text-gray-600">{p['desc']}</p>
+      </div>
+"""
+
+    html += """
     </div>
-    """
+  </main>
 
-html += "</body></html>"
+  <footer class="text-center text-gray-500 text-sm py-6">
+    &copy; 2025 ШИНИ.ONLINE — Вживані шини для будь-якої техніки
+  </footer>
 
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html)
+</body>
+</html>
+"""
 
-print("✅ index.html згенеровано.")
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
-# Git auto-commit & push
-subprocess.run(["git", "add", "index.html", "products.json"])
-subprocess.run(["git", "add", "images"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-subprocess.run(["git", "commit", "-m", "оновлено товари"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-subprocess.run(["git", "push", "origin", "main"])
+if __name__ == "__main__":
+    generate_site()
 

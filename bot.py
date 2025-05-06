@@ -1,13 +1,13 @@
-# bot.py — Telegram-бот для керування товарами
-from telegram import Update, InputMediaPhoto
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
+from telegram import Update
+from telegram.ext import (
+    Application, CommandHandler, MessageHandler, filters,
+    ConversationHandler, ContextTypes
+)
 import json, os, subprocess
 
 TOKEN = "8043656898:AAGTfXdIV0s60scs_5WPXwMlnd2RRQvDLQs"
 PRODUCTS_FILE = "products.json"
-
 ADD_NAME, ADD_DESC, ADD_PHOTO = range(3)
-EDIT_NAME, EDIT_DESC = range(2)
 
 # Завантаження товарів
 def load_products():
@@ -26,29 +26,38 @@ def generate_site():
     subprocess.run(["python3", "generate_site.py"])
 
 # Команда /start
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Привіт! Надішли /add, щоб додати товар, /list — переглянути.")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Привіт! Я бот для керування товарами 🛞\n"
+        "/add — додати товар\n"
+        "/list — переглянути всі товари\n"
+        "/cancel — скасувати дію"
+    )
 
-# Команда /add — старт додавання
-def add_start(update: Update, context: CallbackContext):
-    update.message.reply_text("Введи назву товару:")
+# Команда /add — початок додавання
+async def add_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Введи назву товару:")
     return ADD_NAME
 
-def add_name(update: Update, context: CallbackContext):
+# Збереження назви
+async def add_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["name"] = update.message.text
-    update.message.reply_text("Опис товару:")
+    await update.message.reply_text("Тепер введи опис товару:")
     return ADD_DESC
 
-def add_desc(update: Update, context: CallbackContext):
+# Збереження опису
+async def add_desc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["desc"] = update.message.text
-    update.message.reply_text("Надішли фото товару:")
+    await update.message.reply_text("Надішли фото товару:")
     return ADD_PHOTO
 
-def add_photo(update: Update, context: CallbackContext):
-    photo_file = update.message.photo[-1].get_file()
-    file_path = f"images/{photo_file.file_id}.jpg"
+# Збереження фото
+async def add_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo[-1]
+    photo_file = await photo.get_file()
     os.makedirs("images", exist_ok=True)
-    photo_file.download(file_path)
+    file_path = f"images/{photo_file.file_id}.jpg"
+    await photo_file.download_to_drive(file_path)
 
     products = load_products()
     products.append({
@@ -59,43 +68,46 @@ def add_photo(update: Update, context: CallbackContext):
     })
     save_products(products)
     generate_site()
-    update.message.reply_text("✅ Товар додано!")
+
+    await update.message.reply_text("✅ Товар додано та сайт оновлено!")
     return ConversationHandler.END
 
-def list_products(update: Update, context: CallbackContext):
+# Скасування
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("❌ Дію скасовано.")
+    return ConversationHandler.END
+
+# Команда /list — список товарів
+async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE):
     products = load_products()
     if not products:
-        update.message.reply_text("Список порожній")
+        await update.message.reply_text("Список товарів порожній.")
         return
-    for product in products:
-        with open(product["image"], "rb") as photo:
-            update.message.reply_photo(photo=photo, caption=f"ID: {product['id']}\n{product['name']}\n{product['desc']}")
+    for p in products:
+        caption = f"ID: {p['id']}\n{p['name']}\n{p['desc']}"
+        with open(p['image'], 'rb') as img:
+            await update.message.reply_photo(photo=img, caption=caption)
 
-def cancel(update: Update, context: CallbackContext):
-    update.message.reply_text("Скасовано")
-    return ConversationHandler.END
-
+# Запуск бота
 def main():
-    updater = Updater(TOKEN)
-    dp = updater.dispatcher
+    app = Application.builder().token(TOKEN).build()
 
     add_conv = ConversationHandler(
         entry_points=[CommandHandler("add", add_start)],
         states={
-            ADD_NAME: [MessageHandler(Filters.text & ~Filters.command, add_name)],
-            ADD_DESC: [MessageHandler(Filters.text & ~Filters.command, add_desc)],
-            ADD_PHOTO: [MessageHandler(Filters.photo, add_photo)],
+            ADD_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_name)],
+            ADD_DESC: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_desc)],
+            ADD_PHOTO: [MessageHandler(filters.PHOTO, add_photo)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("list", list_products))
-    dp.add_handler(add_conv)
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("list", list_products))
+    app.add_handler(add_conv)
 
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
