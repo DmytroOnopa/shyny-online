@@ -22,5 +22,11 @@
     "name": "Сільгосп шини 650/85R38 Б\\У. В наявності!",
     "desc": "Постачаємо сільгосп шини Б/У:\nСільськогосподарські шини r10-r54 на трактори, комбайни, телескопічні навантажувачі, сівалки, плуги, борони, культиватори, обприскувачі, зрошувачі, сільгосппричепи, для міжряддя.",
     "image": "images/AgACAgIAAxkBAANDaBnMQAFcMUt9D2R1znc0GRoGI-MAAmb5MRvme8lIFFBMGpQOFE0BAAMCAAN4AAM2BA.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Test2",
+    "desc": "Description for Test2",
+    "image": "images/AgACAgIAAxkBAANLaBnSxs7Lo4Icjga2zZkwjM7qnPgAAiXyMRvme9FIwgABJV3Txhp-AQADAgADeAADNgQ.jpg"
   }
 ]
