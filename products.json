@@ -1,49 +1,44 @@
 [
-  {
-    "id": 1,
-    "name": "Вживані шини до вантажних автомобілів, причепів та напівпричепів.",
-    "desc": "Б/У шини Для вантажівок ГАЗ 53 КамАЗ МАЗ ЗИЛ МАН Scania. А також для причепів напівпричепів бочок та зерновозів!",
-    "image": "images/AgACAgIAAxkBAAMRaBnAH3tkAc79--As-yJ6hj-wyZsAArf4MRvme8lIyE30oo-OKP4BAAMCAANtAAM2BA.jpg"
-  },
-  {
-    "id": 2,
-    "name": "Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ",
-    "desc": "Продаємо вживані шини BRIDGESTONE 385/65 R22.5\nКар єрна модель з посиленим кордом.\nПідійде для зерновозів та техніки під перевантаження.\nМіцна резина з гарним залишком протектора.",
-    "image": "images/AgACAgIAAxkBAAMpaBnDrIDIHJ6S4OF-XwOcp1XF2RYAAtf4MRvme8lIMjds1DEQ2_kBAAMCAAN5AAM2BA.jpg"
-  },
-  {
-    "id": 3,
-    "name": "TEST TIRES",
-    "desc": "Test tires description.",
-    "image": "images/AgACAgIAAxkBAAM3aBnHrKWllnqW_-Y0CkzGl_EoyMMAAgb5MRvme8lInyaU-OP9yOUBAAMCAAN4AAM2BA.jpg"
-  },
-  {
-    "id": 4,
-    "name": "Сільгосп шини 650/85R38 Б\\У. В наявності!",
-    "desc": "Постачаємо сільгосп шини Б/У:\nСільськогосподарські шини r10-r54 на трактори, комбайни, телескопічні навантажувачі, сівалки, плуги, борони, культиватори, обприскувачі, зрошувачі, сільгосппричепи, для міжряддя.",
-    "image": "images/AgACAgIAAxkBAANDaBnMQAFcMUt9D2R1znc0GRoGI-MAAmb5MRvme8lIFFBMGpQOFE0BAAMCAAN4AAM2BA.jpg"
-  },
-  {
-    "id": 5,
-    "name": "Великий вибір легкових шин на літо Б/У",
-    "desc": "Є всі розміри в наявності! Телефонуйте 066 720 58 55",
-    "image": "images/AgACAgIAAxkBAANZaBnchiNT_LD9dH6OuQuQNs7RIvkAAqbyMRvme9FIARPtvBXotF0BAAMCAAN5AAM2BA.jpg"
-  },
-  {
-    "id": 6,
-    "name": "710/70R38 BKT AGRIMAX",
-    "desc": "Категорії: На обприскувач, На трактор, Шини 710/70 R38 на трактор, Шини на виноградозбиральний комбайн\n\nBKT Agrimax RT-765 – це радіальна, безкамерна, всесезонна шина, призначена для встновлення на сільськогосподарські трактори, що працюють у надважких умовах, таких як перевезення вантажів, робота з навісним обладнанням, обробка садів та виноградників.",
-    "image": "images/e13b9e68-2b9e-4d2c-af4c-1bb0744ad0bc.jpg"
-  },
-  {
-    "id": 7,
-    "name": "Тест",
-    "desc": "ТестТест",
-    "image": "images/AgACAgIAAxkBAAPHaBoLGhN-poSfyVgVO2WQQT9CzyoAAmLvMRsTUNBIWk-VGDO_-7ABAAMCAAN5AAM2BA.jpg"
-  },
-  {
-    "name": "TEST TIRES",
-    "desc": "TEST TIRES DESCRIPTION",
-    "image": "images/dab13708c09349edadcf26ebea660d0b.jpg"
-  }
+    {
+        "id": 1,
+        "name": "Вживані шини до вантажних автомобілів, причепів та напівпричепів.",
+        "desc": "Б/У шини Для вантажівок ГАЗ 53 КамАЗ МАЗ ЗИЛ МАН Scania. А також для причепів напівпричепів бочок та зерновозів!",
+        "image": "images/AgACAgIAAxkBAAMRaBnAH3tkAc79--As-yJ6hj-wyZsAArf4MRvme8lIyE30oo-OKP4BAAMCAANtAAM2BA.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ",
+        "desc": "Продаємо вживані шини BRIDGESTONE 385/65 R22.5\nКар єрна модель з посиленим кордом.\nПідійде для зерновозів та техніки під перевантаження.\nМіцна резина з гарним залишком протектора.",
+        "image": "images/AgACAgIAAxkBAAMpaBnDrIDIHJ6S4OF-XwOcp1XF2RYAAtf4MRvme8lIMjds1DEQ2_kBAAMCAAN5AAM2BA.jpg"
+    },
+    {
+        "id": 3,
+        "name": "TEST TIRES",
+        "desc": "Test tires description.",
+        "image": "images/AgACAgIAAxkBAAM3aBnHrKWllnqW_-Y0CkzGl_EoyMMAAgb5MRvme8lInyaU-OP9yOUBAAMCAAN4AAM2BA.jpg"
+    },
+    {
+        "id": 4,
+        "name": "Сільгосп шини 650/85R38 Б\\У. В наявності!",
+        "desc": "Постачаємо сільгосп шини Б/У:\nСільськогосподарські шини r10-r54 на трактори, комбайни, телескопічні навантажувачі, сівалки, плуги, борони, культиватори, обприскувачі, зрошувачі, сільгосппричепи, для міжряддя.",
+        "image": "images/AgACAgIAAxkBAANDaBnMQAFcMUt9D2R1znc0GRoGI-MAAmb5MRvme8lIFFBMGpQOFE0BAAMCAAN4AAM2BA.jpg"
+    },
+    {
+        "id": 5,
+        "name": "Великий вибір легкових шин на літо Б/У",
+        "desc": "Є всі розміри в наявності! Телефонуйте 066 720 58 55",
+        "image": "images/AgACAgIAAxkBAANZaBnchiNT_LD9dH6OuQuQNs7RIvkAAqbyMRvme9FIARPtvBXotF0BAAMCAAN5AAM2BA.jpg"
+    },
+    {
+        "id": 6,
+        "name": "710/70R38 BKT AGRIMAX",
+        "desc": "Категорії: На обприскувач, На трактор, Шини 710/70 R38 на трактор, Шини на виноградозбиральний комбайн\n\nBKT Agrimax RT-765 – це радіальна, безкамерна, всесезонна шина, призначена для встновлення на сільськогосподарські трактори, що працюють у надважких умовах, таких як перевезення вантажів, робота з навісним обладнанням, обробка садів та виноградників.",
+        "image": "images/e13b9e68-2b9e-4d2c-af4c-1bb0744ad0bc.jpg"
+    },
+    {
+        "id": 7,
+        "name": "Тест",
+        "desc": "ТестТест",
+        "image": "images/AgACAgIAAxkBAAPHaBoLGhN-poSfyVgVO2WQQT9CzyoAAmLvMRsTUNBIWk-VGDO_-7ABAAMCAAN5AAM2BA.jpg"
+    }
 ]

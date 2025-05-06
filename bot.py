@@ -1,6 +1,6 @@
 import os
 import json
-from telegram import Update, InputMediaPhoto
+from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
 from telegram.ext import CallbackContext
 import logging
@@ -43,7 +43,8 @@ async def start(update: Update, context: CallbackContext):
             "/add - Додати товар\n"
             "/edit_name - Редагувати назву товару\n"
             "/edit_description - Редагувати опис товару\n"
-            "/edit_photo - Редагувати фото товару"
+            "/edit_photo - Редагувати фото товару\n"
+            "/delete - Видалити товар"
         )
     else:
         await update.message.reply_text("Вибачте, у вас немає доступу до цього бота.")
@@ -67,71 +68,47 @@ async def add_product(update: Update, context: CallbackContext):
     if not is_admin(user_id):
         await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
         return
-    await update.message.reply_text("Надішліть фото для нового товару.")
+
+    await update.message.reply_text("Відправте фото для товару.")
     return 1
 
-# Обробка фото при додаванні товару
+# Додавання фото для товару
 async def add_photo(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
+    photo_file = await update.message.photo[-1].get_file()
+    photo_path = f"images/{photo_file.file_id}.jpg"
+    photo_file.download(photo_path)
 
-    photo = update.message.photo[-1]
-    
-    # Генерація унікального імені для фото
-    existing_files = os.listdir("images")
-    indices = [int(f.split(".")[0]) for f in existing_files if f.endswith(".jpg") and f.split(".")[0].isdigit()]
-    next_index = max(indices, default=0) + 1
-    image_path = f"images/{next_index}.jpg"
-    
-    # Завантажуємо фото
-    file = await context.bot.get_file(photo.file_id)
-    await file.download_to_drive(image_path)
-
-    # Запит на назву товару
-    context.user_data["image_path"] = image_path
-    await update.message.reply_text("Фото додано. Тепер надайте назву товару.")
+    context.user_data["photo_path"] = photo_path
+    await update.message.reply_text("Тепер введіть назву товару.")
     return 2
 
-# Отримання назви товару
+# Додавання назви товару
 async def add_name(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
-
     name = update.message.text
     context.user_data["name"] = name
-    await update.message.reply_text(f"Назва товару: {name}. Тепер надайте опис товару.")
+    await update.message.reply_text("Тепер введіть опис товару.")
     return 3
 
-# Отримання опису товару
+# Додавання опису товару
 async def add_description(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
-
     description = update.message.text
     context.user_data["description"] = description
 
-    # Збереження товару в JSON
     products = load_products()
-    product = {
-        "id": len(products) + 1,
+    product_id = len(products) + 1  # Призначаємо унікальний ID товару
+    new_product = {
+        "id": product_id,
         "name": context.user_data["name"],
-        "desc": context.user_data["description"],
-        "image": context.user_data["image_path"]
+        "description": context.user_data["description"],
+        "photo": context.user_data["photo_path"]
     }
-    products.append(product)
+    products.append(new_product)
 
     with open("products.json", "w", encoding="utf-8") as f:
         json.dump(products, f, ensure_ascii=False, indent=4)
 
     generate_site()
-
-    await update.message.reply_text(f"Товар '{product['name']}' успішно додано.")
+    await update.message.reply_text(f"Товар '{new_product['name']}' успішно додано.")
     return ConversationHandler.END
 
 # Редагування назви товару
@@ -150,7 +127,7 @@ async def edit_name(update: Update, context: CallbackContext):
     await update.message.reply_text(f"Оберіть товар для редагування:\n{product_list}")
     return 4
 
-# Обробка вибору товару для редагування
+# Вибір товару для редагування
 async def choose_product(update: Update, context: CallbackContext):
     product_id = int(update.message.text)
     products = load_products()
@@ -161,22 +138,150 @@ async def choose_product(update: Update, context: CallbackContext):
         return ConversationHandler.END
 
     context.user_data["product_id"] = product_id
-    await update.message.reply_text(f"Вибрано товар: {product['name']}. Введіть нову назву.")
+    await update.message.reply_text(f"Вибрано товар: {product['name']}. Введіть нову назву товару.")
     return 5
 
 # Оновлення назви товару
 async def update_name(update: Update, context: CallbackContext):
     new_name = update.message.text
-    products = load_products()
+    product_id = context.user_data["product_id"]
 
-    product = next((p for p in products if p["id"] == context.user_data["product_id"]), None)
+    products = load_products()
+    product = next((p for p in products if p["id"] == product_id), None)
+
+    if not product:
+        await update.message.reply_text("Товар не знайдено.")
+        return ConversationHandler.END
+
+    product["name"] = new_name
+
+    with open("products.json", "w", encoding="utf-8") as f:
+        json.dump(products, f, ensure_ascii=False, indent=4)
+
+    generate_site()
+    await update.message.reply_text(f"Назву товару успішно змінено на '{new_name}'.")
+    return ConversationHandler.END
+
+# Редагування опису товару
+async def edit_description(update: Update, context: CallbackContext):
+    user_id = update.message.from_user.id
+    if not is_admin(user_id):
+        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
+        return
+
+    products = load_products()
+    if not products:
+        await update.message.reply_text("Немає товарів для редагування.")
+        return
+
+    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
+    await update.message.reply_text(f"Оберіть товар для редагування опису:\n{product_list}")
+    return 6
+
+# Оновлення опису товару
+async def update_description(update: Update, context: CallbackContext):
+    new_description = update.message.text
+    product_id = context.user_data["product_id"]
+
+    products = load_products()
+    product = next((p for p in products if p["id"] == product_id), None)
+
+    if not product:
+        await update.message.reply_text("Товар не знайдено.")
+        return ConversationHandler.END
+
+    product["description"] = new_description
+
+    with open("products.json", "w", encoding="utf-8") as f:
+        json.dump(products, f, ensure_ascii=False, indent=4)
+
+    generate_site()
+    await update.message.reply_text(f"Опис товару успішно змінено.")
+    return ConversationHandler.END
+
+# Редагування фото товару
+async def edit_photo(update: Update, context: CallbackContext):
+    user_id = update.message.from_user.id
+    if not is_admin(user_id):
+        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
+        return
+
+    products = load_products()
+    if not products:
+        await update.message.reply_text("Немає товарів для редагування.")
+        return
+
+    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
+    await update.message.reply_text(f"Оберіть товар для редагування фото:\n{product_list}")
+    return 8
+
+# Оновлення фото товару
+async def update_photo(update: Update, context: CallbackContext):
+    photo_file = await update.message.photo[-1].get_file()
+    photo_path = f"images/{photo_file.file_id}.jpg"
+    photo_file.download(photo_path)
+
+    product_id = context.user_data["product_id"]
+
+    products = load_products()
+    product = next((p for p in products if p["id"] == product_id), None)
+
+    if not product:
+        await update.message.reply_text("Товар не знайдено.")
+        return ConversationHandler.END
+
+    product["photo"] = photo_path
+
+    with open("products.json", "w", encoding="utf-8") as f:
+        json.dump(products, f, ensure_ascii=False, indent=4)
+
+    generate_site()
+    await update.message.reply_text(f"Фото товару успішно оновлено.")
+    return ConversationHandler.END
+
+# Видалення товару
+async def delete_product(update: Update, context: CallbackContext):
+    user_id = update.message.from_user.id
+    if not is_admin(user_id):
+        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
+        return
+
+    products = load_products()
+    if not products:
+        await update.message.reply_text("Немає товарів для видалення.")
+        return
+
+    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
+    await update.message.reply_text(f"Оберіть товар для видалення:\n{product_list}")
+    return 6
+
+# Обробка вибору товару для видалення
+async def choose_product_for_deletion(update: Update, context: CallbackContext):
+    product_id = int(update.message.text)
+    products = load_products()
+    product = next((p for p in products if p["id"] == product_id), None)
+
+    if not product:
+        await update.message.reply_text("Товар не знайдено.")
+        return ConversationHandler.END
+
+    context.user_data["product_id"] = product_id
+    await update.message.reply_text(f"Вибрано товар: {product['name']}. Підтвердіть видалення, надіславши команду /confirm_delete.")
+    return 7
+
+# Підтвердження видалення товару
+async def confirm_delete(update: Update, context: CallbackContext):
+    product_id = context.user_data["product_id"]
+    products = load_products()
+    product = next((p for p in products if p["id"] == product_id), None)
+
     if product:
-        product["name"] = new_name
+        products = [p for p in products if p["id"] != product_id]
         with open("products.json", "w", encoding="utf-8") as f:
             json.dump(products, f, ensure_ascii=False, indent=4)
         generate_site()
 
-    await update.message.reply_text(f"Назву товару змінено на: {new_name}.")
+    await update.message.reply_text(f"Товар '{product['name']}' успішно видалено.")
     return ConversationHandler.END
 
 # Основна функція для запуску бота
@@ -187,15 +292,21 @@ def main():
     list_handler = CommandHandler("list", list_products)
     add_handler = CommandHandler("add", add_product)
     edit_name_handler = CommandHandler("edit_name", edit_name)
+    edit_description_handler = CommandHandler("edit_description", edit_description)
+    edit_photo_handler = CommandHandler("edit_photo", edit_photo)
+    delete_handler = CommandHandler("delete", delete_product)
 
     conversation_handler = ConversationHandler(
-        entry_points=[add_handler, edit_name_handler],
+        entry_points=[add_handler, edit_name_handler, edit_description_handler, edit_photo_handler, delete_handler],
         states={
             1: [MessageHandler(filters.PHOTO, add_photo)],
             2: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_name)],
             3: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_description)],
             4: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_product)],
             5: [MessageHandler(filters.TEXT & ~filters.COMMAND, update_name)],
+            6: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_product_for_deletion)],
+            7: [MessageHandler(filters.COMMAND, confirm_delete)],
+            8: [MessageHandler(filters.PHOTO, update_photo)],
         },
         fallbacks=[],
     )
@@ -203,7 +314,7 @@ def main():
     application.add_handler(start_handler)
     application.add_handler(list_handler)
     application.add_handler(conversation_handler)
-    
+
     application.run_polling()
 
 if __name__ == "__main__":
