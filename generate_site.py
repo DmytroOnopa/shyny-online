@@ -1,6 +1,5 @@
 import json
 import os
-import subprocess  # Для виконання команд Git
 
 def load_products():
     if not os.path.exists("products.json"):
@@ -19,12 +18,12 @@ def generate_site():
   <title>ШИНИ.ONLINE</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-900 text-gray-100">
 
-  <header class="bg-white shadow sticky top-0 z-10">
+  <header class="bg-gray-800 shadow sticky top-0 z-10">
     <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-900">🛞 ИНИ.ONLINE</h1>
-      <a href="https://t.me/shynyRobot" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Зв'язатися</a>
+      <a href="index.html" class="text-2xl font-bold text-white hover:text-yellow-400 transition">🛞 ШИНИ.ONLINE</a>
+      <a href="https://t.me/shynyRobot" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-4 py-2 rounded transition">Зв'язатися</a>
     </div>
   </header>
 
@@ -36,10 +35,10 @@ def generate_site():
     for p in products:
         image_path = p["image"].replace("images/", "")
         html += f"""
-      <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4">
+      <div class="bg-gray-800 rounded-2xl shadow hover:shadow-lg transition p-4">
         <img src="images/{image_path}" alt="{p['name']}" class="rounded-xl w-full h-52 object-cover mb-4">
-        <h3 class="text-lg font-bold">{p['name']}</h3>
-        <p class="text-sm text-gray-600">{p['desc']}</p>
+        <h3 class="text-lg font-bold text-white">{p['name']}</h3>
+        <p class="text-sm text-gray-300">{p['desc']}</p>
       </div>
 """
 
@@ -47,7 +46,7 @@ def generate_site():
     </div>
   </main>
 
-  <footer class="text-center text-gray-500 text-sm py-6">
+  <footer class="text-center text-gray-400 text-sm py-6">
     &copy; 2025 ШИНИ.ONLINE — Вживані шини для будь-якої техніки
   </footer>
 
@@ -58,10 +57,10 @@ def generate_site():
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
 
-    # Пуш в git після генерації сайту
-    subprocess.run(["git", "add", "."])  # Додаємо зміни
-    subprocess.run(["git", "commit", "-m", "Оновлений сайт після додавання товару"])  # Створюємо коміт
-    subprocess.run(["git", "push"])  # Пушимо в репозиторій
+    # Git команди
+    os.system("git add index.html products.json images/")
+    os.system("git commit -m 'Оновлення сайту та товарів'")
+    os.system("git push")
 
 if __name__ == "__main__":
     generate_site()
