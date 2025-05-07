@@ -1,322 +1,137 @@
 import os
 import json
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ConversationHandler, MessageHandler, filters
-from telegram.ext import CallbackContext
 import logging
-from dotenv import load_dotenv
 import subprocess
+import datetime
+from uuid import uuid4
+from dotenv import load_dotenv
+from telegram import Update, InputFile, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    ApplicationBuilder, CommandHandler, MessageHandler, filters,
+    ContextTypes, ConversationHandler, CallbackQueryHandler
+)
 
-# Завантажуємо змінні середовища з .env
+# Load environment variables
 load_dotenv()
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
-# Токен бота
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+# Constants for conversation states
+NAME, DESCRIPTION, PHOTO = range(3)
 
-# Налаштування логування
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+# File paths
+PRODUCTS_FILE = "products.json"
+IMAGES_DIR = "images"
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Змінна для перевірки, чи користувач є адміністратором
-ADMIN_ID = 249385425
+if not os.path.exists(IMAGES_DIR):
+    os.makedirs(IMAGES_DIR)
 
-# Завантаження товарів з файлу products.json
 def load_products():
-    if not os.path.exists("products.json"):
-        return []
-    with open("products.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+    if os.path.exists(PRODUCTS_FILE):
+        with open(PRODUCTS_FILE, 'r') as f:
+            return json.load(f)
+    return []
 
-# Генерація сайту
+def save_products(products):
+    with open(PRODUCTS_FILE, 'w') as f:
+        json.dump(products, f, indent=2, ensure_ascii=False)
+
 def generate_site():
-    products = load_products()
     subprocess.run(["python3", "generate_site.py"])
+    push_images_to_github()
 
-# Стартова команда
-async def start(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if user_id == ADMIN_ID:
-        await update.message.reply_text(
-            "Привіт! Використовуй команди для керування товарами:\n"
-            "/list - Список товарів\n"
-            "/add - Додати товар\n"
-            "/edit_name - Редагувати назву товару\n"
-            "/edit_description - Редагувати опис товару\n"
-            "/edit_photo - Редагувати фото товару\n"
-            "/delete - Видалити товар"
-        )
-    else:
-        await update.message.reply_text("Вибачте, у вас немає доступу до цього бота.")
+def push_images_to_github():
+    try:
+        subprocess.run(["git", "add", "images/"], check=True)
+        subprocess.run(["git", "commit", "-m", f"🖼️ Додано фото {datetime.datetime.now()}"])
+        subprocess.run(["git", "push"], check=True)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Git push failed: {e}")
 
-# Перевірка на адміністраторський доступ
-def is_admin(user_id):
-    return user_id == ADMIN_ID
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+    await update.message.reply_text("Привіт! Це адмін-бот для керування товарами.")
 
-# Команда для перегляду списку товарів
-async def list_products(update: Update, context: CallbackContext):
+async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
     products = load_products()
     if not products:
-        await update.message.reply_text("Немає доступних товарів.")
-    else:
-        product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
-        await update.message.reply_text(f"Список товарів:\n{product_list}")
-
-# Додавання нового товару
-async def add_product(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
+        await update.message.reply_text("Список товарів порожній.")
         return
+    for product in products:
+        caption = f"{product['name']}\n{product['description']}"
+        image_path = os.path.join(IMAGES_DIR, product['photo'])
+        if os.path.exists(image_path):
+            await context.bot.send_photo(chat_id=update.effective_chat.id, photo=InputFile(image_path), caption=caption)
+        else:
+            await update.message.reply_text(caption)
 
-    await update.message.reply_text("Відправте фото для товару.")
-    return 1
+async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_user.id != ADMIN_ID:
+        return
+    await update.message.reply_text("Введіть назву товару:")
+    return NAME
 
-# Додавання фото для товару
-async def add_photo(update: Update, context: CallbackContext):
-    photo_file = await update.message.photo[-1].get_file()
-    photo_path = f"images/{photo_file.file_id}.jpg"
-    photo_file.download(photo_path)
+async def add_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['name'] = update.message.text
+    await update.message.reply_text("Введіть опис товару:")
+    return DESCRIPTION
 
-    context.user_data["photo_path"] = photo_path
-    await update.message.reply_text("Тепер введіть назву товару.")
-    return 2
+async def add_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['description'] = update.message.text
+    await update.message.reply_text("Надішліть фото товару:")
+    return PHOTO
 
-# Додавання назви товару
-async def add_name(update: Update, context: CallbackContext):
-    name = update.message.text
-    context.user_data["name"] = name
-    await update.message.reply_text("Тепер введіть опис товару.")
-    return 3
-
-# Додавання опису товару
-async def add_description(update: Update, context: CallbackContext):
-    description = update.message.text
-    context.user_data["description"] = description
+async def add_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    photo = update.message.photo[-1]
+    file = await photo.get_file()
+    file_ext = '.jpg'
+    filename = f"{uuid4().hex}{file_ext}"
+    path = os.path.join(IMAGES_DIR, filename)
+    await file.download_to_drive(path)
 
     products = load_products()
-    product_id = len(products) + 1  # Призначаємо унікальний ID товару
     new_product = {
-        "id": product_id,
-        "name": context.user_data["name"],
-        "description": context.user_data["description"],
-        "photo": context.user_data["photo_path"]
+        "id": uuid4().hex,
+        "name": context.user_data['name'],
+        "description": context.user_data['description'],
+        "photo": filename
     }
     products.append(new_product)
-
-    with open("products.json", "w", encoding="utf-8") as f:
-        json.dump(products, f, ensure_ascii=False, indent=4)
-
+    save_products(products)
     generate_site()
-    await update.message.reply_text(f"Товар '{new_product['name']}' успішно додано.")
+
+    await update.message.reply_text("✅ Товар додано!")
     return ConversationHandler.END
 
-# Редагування назви товару
-async def edit_name(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
-
-    products = load_products()
-    if not products:
-        await update.message.reply_text("Немає товарів для редагування.")
-        return
-
-    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
-    await update.message.reply_text(f"Оберіть товар для редагування:\n{product_list}")
-    return 4
-
-# Вибір товару для редагування
-async def choose_product(update: Update, context: CallbackContext):
-    product_id = int(update.message.text)
-    products = load_products()
-    product = next((p for p in products if p["id"] == product_id), None)
-
-    if not product:
-        await update.message.reply_text("Товар не знайдено.")
-        return ConversationHandler.END
-
-    context.user_data["product_id"] = product_id
-    await update.message.reply_text(f"Вибрано товар: {product['name']}. Введіть нову назву товару.")
-    return 5
-
-# Оновлення назви товару
-async def update_name(update: Update, context: CallbackContext):
-    new_name = update.message.text
-    product_id = context.user_data["product_id"]
-
-    products = load_products()
-    product = next((p for p in products if p["id"] == product_id), None)
-
-    if not product:
-        await update.message.reply_text("Товар не знайдено.")
-        return ConversationHandler.END
-
-    product["name"] = new_name
-
-    with open("products.json", "w", encoding="utf-8") as f:
-        json.dump(products, f, ensure_ascii=False, indent=4)
-
-    generate_site()
-    await update.message.reply_text(f"Назву товару успішно змінено на '{new_name}'.")
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Дію скасовано.")
     return ConversationHandler.END
 
-# Редагування опису товару
-async def edit_description(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
-
-    products = load_products()
-    if not products:
-        await update.message.reply_text("Немає товарів для редагування.")
-        return
-
-    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
-    await update.message.reply_text(f"Оберіть товар для редагування опису:\n{product_list}")
-    return 6
-
-# Оновлення опису товару
-async def update_description(update: Update, context: CallbackContext):
-    new_description = update.message.text
-    product_id = context.user_data["product_id"]
-
-    products = load_products()
-    product = next((p for p in products if p["id"] == product_id), None)
-
-    if not product:
-        await update.message.reply_text("Товар не знайдено.")
-        return ConversationHandler.END
-
-    product["description"] = new_description
-
-    with open("products.json", "w", encoding="utf-8") as f:
-        json.dump(products, f, ensure_ascii=False, indent=4)
-
-    generate_site()
-    await update.message.reply_text(f"Опис товару успішно змінено.")
-    return ConversationHandler.END
-
-# Редагування фото товару
-async def edit_photo(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
-
-    products = load_products()
-    if not products:
-        await update.message.reply_text("Немає товарів для редагування.")
-        return
-
-    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
-    await update.message.reply_text(f"Оберіть товар для редагування фото:\n{product_list}")
-    return 8
-
-# Оновлення фото товару
-async def update_photo(update: Update, context: CallbackContext):
-    photo_file = await update.message.photo[-1].get_file()
-    photo_path = f"images/{photo_file.file_id}.jpg"
-    photo_file.download(photo_path)
-
-    product_id = context.user_data["product_id"]
-
-    products = load_products()
-    product = next((p for p in products if p["id"] == product_id), None)
-
-    if not product:
-        await update.message.reply_text("Товар не знайдено.")
-        return ConversationHandler.END
-
-    product["photo"] = photo_path
-
-    with open("products.json", "w", encoding="utf-8") as f:
-        json.dump(products, f, ensure_ascii=False, indent=4)
-
-    generate_site()
-    await update.message.reply_text(f"Фото товару успішно оновлено.")
-    return ConversationHandler.END
-
-# Видалення товару
-async def delete_product(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
-    if not is_admin(user_id):
-        await update.message.reply_text("Вибачте, у вас немає доступу до цієї команди.")
-        return
-
-    products = load_products()
-    if not products:
-        await update.message.reply_text("Немає товарів для видалення.")
-        return
-
-    product_list = "\n".join([f"{p['name']} (ID: {p['id']})" for p in products])
-    await update.message.reply_text(f"Оберіть товар для видалення:\n{product_list}")
-    return 6
-
-# Обробка вибору товару для видалення
-async def choose_product_for_deletion(update: Update, context: CallbackContext):
-    product_id = int(update.message.text)
-    products = load_products()
-    product = next((p for p in products if p["id"] == product_id), None)
-
-    if not product:
-        await update.message.reply_text("Товар не знайдено.")
-        return ConversationHandler.END
-
-    context.user_data["product_id"] = product_id
-    await update.message.reply_text(f"Вибрано товар: {product['name']}. Підтвердіть видалення, надіславши команду /confirm_delete.")
-    return 7
-
-# Підтвердження видалення товару
-async def confirm_delete(update: Update, context: CallbackContext):
-    product_id = context.user_data["product_id"]
-    products = load_products()
-    product = next((p for p in products if p["id"] == product_id), None)
-
-    if product:
-        products = [p for p in products if p["id"] != product_id]
-        with open("products.json", "w", encoding="utf-8") as f:
-            json.dump(products, f, ensure_ascii=False, indent=4)
-        generate_site()
-
-    await update.message.reply_text(f"Товар '{product['name']}' успішно видалено.")
-    return ConversationHandler.END
-
-# Основна функція для запуску бота
 def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    start_handler = CommandHandler("start", start)
-    list_handler = CommandHandler("list", list_products)
-    add_handler = CommandHandler("add", add_product)
-    edit_name_handler = CommandHandler("edit_name", edit_name)
-    edit_description_handler = CommandHandler("edit_description", edit_description)
-    edit_photo_handler = CommandHandler("edit_photo", edit_photo)
-    delete_handler = CommandHandler("delete", delete_product)
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("list", list_products))
 
-    conversation_handler = ConversationHandler(
-        entry_points=[add_handler, edit_name_handler, edit_description_handler, edit_photo_handler, delete_handler],
+    add_conv = ConversationHandler(
+        entry_points=[CommandHandler("add", add_product)],
         states={
-            1: [MessageHandler(filters.PHOTO, add_photo)],
-            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_name)],
-            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_description)],
-            4: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_product)],
-            5: [MessageHandler(filters.TEXT & ~filters.COMMAND, update_name)],
-            6: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_product_for_deletion)],
-            7: [MessageHandler(filters.COMMAND, confirm_delete)],
-            8: [MessageHandler(filters.PHOTO, update_photo)],
+            NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_name)],
+            DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_description)],
+            PHOTO: [MessageHandler(filters.PHOTO, add_photo)],
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", cancel)]
     )
+    app.add_handler(add_conv)
 
-    application.add_handler(start_handler)
-    application.add_handler(list_handler)
-    application.add_handler(conversation_handler)
+    app.run_polling()
 
-    application.run_polling()
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
 
