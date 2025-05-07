@@ -1,58 +1,87 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Шини онлайн</title>
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        .product { border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 10px; display: inline-block; width: 200px; vertical-align: top; }
-        img { max-width: 100%; border-radius: 8px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ШИНИ.ONLINE</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .card:hover {
+      transform: scale(1.03);
+      transition: transform 0.3s ease;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 </head>
-<body>
-<h1>Шини онлайн</h1>
+<body class="bg-gray-900 text-white">
 
-<div class="product">
-    <img src="images/AgACAgIAAxkBAAMRaBnAH3tkAc79--As-yJ6hj-wyZsAArf4MRvme8lIyE30oo-OKP4BAAMCAANtAAM2BA.jpg" alt="Вживані шини до вантажних автомобілів, причепів та напівпричепів.">
-    <h3>Вживані шини до вантажних автомобілів, причепів та напівпричепів.</h3>
-    <p>Б/У шини Для вантажівок ГАЗ 53 КамАЗ МАЗ ЗИЛ МАН Scania. А також для причепів напівпричепів бочок та зерновозів!</p>
-</div>
+  <header class="bg-gray-800 shadow sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold text-white hover:text-blue-400 transition">🛞 ШИНИ.ONLINE</a>
+      <a href="https://t.me/shynyRobot" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition shadow-lg">Зв'язатися</a>
+    </div>
+  </header>
 
-<div class="product">
-    <img src="images/AgACAgIAAxkBAAMpaBnDrIDIHJ6S4OF-XwOcp1XF2RYAAtf4MRvme8lIMjds1DEQ2_kBAAMCAAN5AAM2BA.jpg" alt="Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ">
-    <h3>Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ</h3>
-    <p>Продаємо вживані шини BRIDGESTONE 385/65 R22.5
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-xl font-semibold mb-6">Доступні товари:</h2>
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+
+      <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
+        <img src="images/AgACAgIAAxkBAAMRaBnAH3tkAc79--As-yJ6hj-wyZsAArf4MRvme8lIyE30oo-OKP4BAAMCAANtAAM2BA.jpg" alt="Вживані шини до вантажних автомобілів, причепів та напівпричепів." class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold text-white">Вживані шини до вантажних автомобілів, причепів та напівпричепів.</h3>
+        <p class="text-sm text-gray-300">Б/У шини Для вантажівок ГАЗ 53 КамАЗ МАЗ ЗИЛ МАН Scania. А також для причепів напівпричепів бочок та зерновозів!</p>
+      </div>
+
+      <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
+        <img src="images/AgACAgIAAxkBAAMpaBnDrIDIHJ6S4OF-XwOcp1XF2RYAAtf4MRvme8lIMjds1DEQ2_kBAAMCAAN5AAM2BA.jpg" alt="Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold text-white">Шина BRIDGESTONE 385/65 R22.5 кар єрна для зерновоза БУ</h3>
+        <p class="text-sm text-gray-300">Продаємо вживані шини BRIDGESTONE 385/65 R22.5
 Кар єрна модель з посиленим кордом.
 Підійде для зерновозів та техніки під перевантаження.
 Міцна резина з гарним залишком протектора.</p>
-</div>
+      </div>
 
-<div class="product">
-    <img src="images/AgACAgIAAxkBAAM3aBnHrKWllnqW_-Y0CkzGl_EoyMMAAgb5MRvme8lInyaU-OP9yOUBAAMCAAN4AAM2BA.jpg" alt="TEST TIRES">
-    <h3>TEST TIRES</h3>
-    <p>Test tires description.</p>
-</div>
+      <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
+        <img src="images/AgACAgIAAxkBAAM3aBnHrKWllnqW_-Y0CkzGl_EoyMMAAgb5MRvme8lInyaU-OP9yOUBAAMCAAN4AAM2BA.jpg" alt="TEST TIRES" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold text-white">TEST TIRES</h3>
+        <p class="text-sm text-gray-300">Test tires description.</p>
+      </div>
 
-<div class="product">
-    <img src="images/AgACAgIAAxkBAANDaBnMQAFcMUt9D2R1znc0GRoGI-MAAmb5MRvme8lIFFBMGpQOFE0BAAMCAAN4AAM2BA.jpg" alt="Сільгосп шини 650/85R38 Б\У. В наявності!">
-    <h3>Сільгосп шини 650/85R38 Б\У. В наявності!</h3>
-    <p>Постачаємо сільгосп шини Б/У:
+      <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
+        <img src="images/AgACAgIAAxkBAANDaBnMQAFcMUt9D2R1znc0GRoGI-MAAmb5MRvme8lIFFBMGpQOFE0BAAMCAAN4AAM2BA.jpg" alt="Сільгосп шини 650/85R38 Б\У. В наявності!" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold text-white">Сільгосп шини 650/85R38 Б\У. В наявності!</h3>
+        <p class="text-sm text-gray-300">Постачаємо сільгосп шини Б/У:
 Сільськогосподарські шини r10-r54 на трактори, комбайни, телескопічні навантажувачі, сівалки, плуги, борони, культиватори, обприскувачі, зрошувачі, сільгосппричепи, для міжряддя.</p>
-</div>
+      </div>
 
-<div class="product">
-    <img src="images/AgACAgIAAxkBAANZaBnchiNT_LD9dH6OuQuQNs7RIvkAAqbyMRvme9FIARPtvBXotF0BAAMCAAN5AAM2BA.jpg" alt="Великий вибір легкових шин на літо Б/У">
-    <h3>Великий вибір легкових шин на літо Б/У</h3>
-    <p>Є всі розміри в наявності! Телефонуйте 066 720 58 55</p>
-</div>
+      <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
+        <img src="images/AgACAgIAAxkBAANZaBnchiNT_LD9dH6OuQuQNs7RIvkAAqbyMRvme9FIARPtvBXotF0BAAMCAAN5AAM2BA.jpg" alt="Великий вибір легкових шин на літо Б/У" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold text-white">Великий вибір легкових шин на літо Б/У</h3>
+        <p class="text-sm text-gray-300">Є всі розміри в наявності! Телефонуйте 066 720 58 55</p>
+      </div>
 
-<div class="product">
-    <img src="images/e13b9e68-2b9e-4d2c-af4c-1bb0744ad0bc.jpg" alt="710/70R38 BKT AGRIMAX">
-    <h3>710/70R38 BKT AGRIMAX</h3>
-    <p>Категорії: На обприскувач, На трактор, Шини 710/70 R38 на трактор, Шини на виноградозбиральний комбайн
+      <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
+        <img src="images/e13b9e68-2b9e-4d2c-af4c-1bb0744ad0bc.jpg" alt="710/70R38 BKT AGRIMAX" class="rounded-xl w-full h-52 object-cover mb-4">
+        <h3 class="text-lg font-bold text-white">710/70R38 BKT AGRIMAX</h3>
+        <p class="text-sm text-gray-300">Категорії: На обприскувач, На трактор, Шини 710/70 R38 на трактор, Шини на виноградозбиральний комбайн
 
 BKT Agrimax RT-765 – це радіальна, безкамерна, всесезонна шина, призначена для встновлення на сільськогосподарські трактори, що працюють у надважких умовах, таких як перевезення вантажів, робота з навісним обладнанням, обробка садів та виноградників.</p>
-</div>
+      </div>
+
+    </div>
+  </main>
+
+  <section class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-xl font-semibold mb-4">Контакти</h2>
+    <p class="mb-2"><strong>Адреса:</strong> Траса Київ-Луганськ-Ізварено 295, Знам'янка, Кіровоградська область</p>
+    <p class="mb-4"><strong>Телефон:</strong> <a href="tel:+380667204855" class="text-blue-400 hover:underline">066 720 48 55</a></p>
+    <iframe src="https://maps.google.com/maps?q=Траса%20Київ-Луганськ-Ізварено%20295,%20Знам'янка&t=&z=13&ie=UTF8&iwloc=&output=embed"
+      class="w-full h-64 rounded-xl border-0 shadow-lg"></iframe>
+  </section>
+
+  <footer class="text-center text-gray-400 text-sm py-6">
+    &copy; 2025 ШИНИ.ONLINE — Вживані шини для будь-якої техніки
+  </footer>
 
 </body>
 </html>
