@@ -46,5 +46,11 @@
     "name": "test2",
     "description": "test2test2test2",
     "image": "images/fbf3b35e-8838-40ad-b084-82ef1a01dbe1.jpg"
+  },
+  {
+    "id": "10",
+    "name": "test3",
+    "description": "test3test3test3",
+    "image": "images/a251ee66-e199-455d-bb8d-3701e95f1852.jpg"
   }
 ]
