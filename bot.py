@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Станови для ConversationHandler
 NAME, DESCRIPTION, PHOTO = range(3)
-EDIT_CHOOSE, EDIT_NAME, EDIT_DESCRIPTION, EDIT_PHOTO = range(4)
+EDIT_CHOOSE, EDIT_FIELD, EDIT_VALUE = range(3)
 DELETE_CHOOSE = range(1)
 
 # Завантаження/збереження продуктів
@@ -122,6 +122,59 @@ async def delete_product(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text("🗑️ Товар видалено.")
     return ConversationHandler.END
 
+# === Редагування товару ===
+async def edit_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    products = load_products()
+    keyboard = [[InlineKeyboardButton(p["name"], callback_data=p["id"])] for p in products]
+    await update.message.reply_text("Оберіть товар для редагування:", reply_markup=InlineKeyboardMarkup(keyboard))
+    return EDIT_CHOOSE
+
+async def edit_choose(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    product_id = query.data
+    context.user_data["edit_id"] = product_id
+    await query.edit_message_text("Що ви хочете змінити?", reply_markup=InlineKeyboardMarkup([
+        [InlineKeyboardButton("Назву", callback_data="name")],
+        [InlineKeyboardButton("Опис", callback_data="description")],
+        [InlineKeyboardButton("Фото", callback_data="photo")],
+    ]))
+    return EDIT_FIELD
+
+async def edit_select_field(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    field = query.data
+    context.user_data["edit_field"] = field
+    if field == "photo":
+        await query.edit_message_text("Надішліть нове фото товару:")
+    else:
+        await query.edit_message_text(f"Введіть нове значення для {'назви' if field == 'name' else 'опису'}:")
+    return EDIT_VALUE
+
+async def edit_save(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    products = load_products()
+    product_id = context.user_data["edit_id"]
+    field = context.user_data["edit_field"]
+
+    for p in products:
+        if p["id"] == product_id:
+            if field == "photo":
+                photo = update.message.photo[-1]
+                photo_file = await photo.get_file()
+                image_id = str(uuid4()) + ".jpg"
+                image_path = os.path.join(IMAGES_DIR, image_id)
+                await photo_file.download_to_drive(image_path)
+                p["image"] = os.path.join(IMAGES_DIR, image_id)
+            else:
+                p[field] = update.message.text
+            break
+
+    save_products(products)
+    generate_site()
+    await update.message.reply_text("✅ Зміни збережено.")
+    return ConversationHandler.END
+
 # Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id == ADMIN_ID:
@@ -150,10 +203,23 @@ if __name__ == "__main__":
         fallbacks=[]
     )
 
+    edit_conv = ConversationHandler(
+        entry_points=[CommandHandler("edit", edit_start)],
+        states={
+            EDIT_CHOOSE: [CallbackQueryHandler(edit_choose)],
+            EDIT_FIELD: [CallbackQueryHandler(edit_select_field)],
+            EDIT_VALUE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, edit_save),
+                MessageHandler(filters.PHOTO, edit_save)
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+    )
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("list", list_products))
     app.add_handler(add_conv)
     app.add_handler(delete_conv)
+    app.add_handler(edit_conv)
 
     app.run_polling()
-
