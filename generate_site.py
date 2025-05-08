@@ -16,7 +16,8 @@ def generate_site():
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ШИНИ.ONLINE</title>
+  <title>Шини Онлайн – Вживані шини для будь-якої техніки</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     .card:hover {
