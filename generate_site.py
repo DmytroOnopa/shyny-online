@@ -46,7 +46,7 @@ def generate_site():
       <div class="card bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition p-4">
         <img src="images/{image_path}" alt="{p['name']}" class="rounded-xl w-full h-52 object-cover mb-4">
         <h3 class="text-lg font-bold text-white">{p['name']}</h3>
-        <p class="text-sm text-gray-300">{p['desc']}</p>
+        <p class="text-sm text-gray-300">{p['description']}</p>
       </div>
 """
 
