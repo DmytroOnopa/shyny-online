@@ -46,11 +46,5 @@
     "name": "test3",
     "description": "test3test3test3",
     "image": "images/a251ee66-e199-455d-bb8d-3701e95f1852.jpg"
-  },
-  {
-    "id": "11",
-    "name": "\u0422\u0435\u0441\u0442\u0423\u043a\u0440\u041c\u043e\u0432\u0430",
-    "description": "\u0442\u0435\u0441\u0442\u043e\u0432\u0438\u0439 \u043e\u043f\u0438\u0441 \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u043e\u044e",
-    "image": "images/8928a84e-9fbf-4db4-b817-a9a776ad252e.jpg"
   }
 ]
