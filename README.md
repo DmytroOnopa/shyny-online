@@ -11,3 +11,6 @@ cd shyny-online
 pip install -r requirements.txt
 python app.py
 ```
+
+  ◍–––  
+шини.online  
