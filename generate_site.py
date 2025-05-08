@@ -30,7 +30,7 @@ def generate_site():
 
   <header class="bg-gray-800 shadow sticky top-0 z-10">
     <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
-      <a href="index.html" class="text-2xl font-bold text-white hover:text-blue-400 transition">🛞 ШИНИ.ONLINE</a>
+      <a href="index.html" class="text-2xl font-bold text-white hover:text-blue-400 transition">🔘 ШИНИ.ONLINE</a>
       <a href="https://t.me/shynyRobot" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition shadow-lg">Зв'язатися</a>
     </div>
   </header>
