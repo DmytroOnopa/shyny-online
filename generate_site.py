@@ -59,8 +59,7 @@ def generate_site():
     <h2 class="text-xl font-semibold mb-4">Контакти</h2>
     <p class="mb-2"><strong>Адреса:</strong> Траса Київ-Луганськ-Ізварено 295, Знам'янка, Кіровоградська область</p>
     <p class="mb-4"><strong>Телефон:</strong> <a href="tel:+380667204855" class="text-blue-400 hover:underline">066 720 48 55</a></p>
-    <iframe src="https://maps.google.com/maps?q=Траса%20Київ-Луганськ-Ізварено%20295,%20Знам'янка&t=&z=13&ie=UTF8&iwloc=&output=embed"
-      class="w-full h-64 rounded-xl border-0 shadow-lg"></iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11947.545115561164!2d32.719361130354486!3d48.722974841992546!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d08f5668e48a89%3A0xc85452ed1279d969!2z0J_RgNC40LTQvtGA0L7QttC90ZbQuSDQutC-0LzQv9C70LXQutGBINCo0LjQvdC-0LzQvtC90YLQsNC2LdC60LDRhNC1!5e0!3m2!1sru!2sua!4v1746739039513!5m2!1sru!2sua" class="w-full h-64 rounded-xl border-0 shadow-lg"></iframe>
   </section>
 
   <footer class="text-center text-gray-400 text-sm py-6">
