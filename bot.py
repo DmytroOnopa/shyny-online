@@ -178,9 +178,9 @@ async def edit_save(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id == ADMIN_ID:
-        await update.message.reply_text("Привіт, адміне! Скористайся /add, /list, /delete або /edit")
+        await update.message.reply_text("Привіт, адміне! Команди що тобі доступні: /add, /list, /delete або /edit")
     else:
-        await update.message.reply_text("⛔ У тебе немає доступу.")
+        await update.message.reply_text("⛔ У тебе немає доступу. Звернись до @ABTOMATAK")
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
